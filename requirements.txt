@@ -1,0 +1,5 @@
+hugchat
+huggingface_hub
+python-dotenv
+langchain
+PyQt5
