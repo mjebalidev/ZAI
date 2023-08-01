@@ -83,7 +83,7 @@ class ChatApp(QWidget):
         self.append_to_chat_history("Chatbot: " + response)
 
     def generate_response(self, dialogue):
-        # Konkateniere die vorherigen Dialogfragmente zu einem Gespräch
+        # Aneinanderhängen von vorherigen Dialogfragmente zu einem Gespräch
         conversation = " ".join(f"{sender}: {message}" for sender, message in dialogue)
 
         # Führe die LLM-Kette aus, um die Antwort des Chatbots zu generieren
