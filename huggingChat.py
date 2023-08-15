@@ -18,11 +18,9 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QHBoxLayout
 import speech_recognition
 from gtts import gTTS #Google Text To Speech
-import os
-import pyttsx3
-import pyaudio
 from langchain import PromptTemplate, HuggingFaceHub, LLMChain
 from dotenv import load_dotenv
+import audiofile as af
 
 # Lade die Umgebungsvariablen.
 load_dotenv()
@@ -170,6 +168,7 @@ class ChatApp(QWidget):
         sound = gTTS(text, lang='en')
         sound.save("voice.mp3")
         os.system("ffplay -autoexit -loglevel quiet voice.mp3")
+        #af.read("voice.mp3")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
