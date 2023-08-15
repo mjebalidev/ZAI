@@ -16,7 +16,11 @@
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QHBoxLayout
-
+import speech_recognition
+from gtts import gTTS #Google Text To Speech
+import os
+import pyttsx3
+import pyaudio
 from langchain import PromptTemplate, HuggingFaceHub, LLMChain
 from dotenv import load_dotenv
 
@@ -29,6 +33,7 @@ class ChatApp(QWidget):
         self.init_ui()  # Initialisiere die Benutzeroberfläche (UI)
         self.init_llm()  # Initialisiere das Language Model (LLM)
         self.dialogue = []  # Liste für den gesamten Dialog
+        self.record = True
 
     def init_ui(self):
         # Setze Fenster-Eigenschaften
@@ -41,19 +46,45 @@ class ChatApp(QWidget):
         self.chat_history.setStyleSheet("QTextEdit { border: 1px solid gray; border-radius: 10px; padding: 10px; }")
 
         # Setze Eigenschaften der Eingabebox
-        self.input_box = QLineEdit(self)
-        self.input_box.setPlaceholderText("Tippe deine Nachricht hier ein und drücke Enter zum Senden...")
-        self.input_box.setStyleSheet("QLineEdit { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
+        #self.input_box = QLineEdit(self)
+        #self.input_box.setPlaceholderText("Tippe deine Nachricht hier ein und drücke Enter zum Senden...")
+        #self.input_box.setStyleSheet("QLineEdit { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
 
-        self.input_box.returnPressed.connect(self.on_send_button_clicked)
+        #self.input_box.returnPressed.connect(self.on_send_button_clicked)
 
-        chat_input_layout = QHBoxLayout()
-        chat_input_layout.addWidget(self.input_box)
+        # Set set button with hold
+        self.send_button = QPushButton("Start listening", self)
+        self.send_button.setStyleSheet("QPushButton { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
+        self.send_button.clicked.connect(self.on_send_button_clicked)
+
+        # Set stop button
+        self.stop_button = QPushButton("Stop listening", self)
+        self.stop_button.setStyleSheet("QPushButton { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
+        self.stop_button.clicked.connect(self.on_stop_button_clicked)
+
+        # Set exit button
+        self.exit_button = QPushButton("Exit", self)
+        self.exit_button.setStyleSheet("QPushButton { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
+        self.exit_button.clicked.connect(self.exit)
+
+        #chat_input_layout = QHBoxLayout()
+        #chat_input_layout.addWidget(self.input_box)
+
+        send_button_layout = QVBoxLayout()
+        send_button_layout.addWidget(self.send_button)
+
+        stop_button_layout = QVBoxLayout()
+        stop_button_layout.addWidget(self.stop_button)
+
+        exit_button_layout = QVBoxLayout()
+        exit_button_layout.addWidget(self.exit_button)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.chat_history)
-        main_layout.addLayout(chat_input_layout)
-
+        #main_layout.addLayout(chat_input_layout)
+        main_layout.addLayout(send_button_layout)
+        main_layout.addLayout(stop_button_layout)
+        main_layout.addLayout(exit_button_layout)
         self.setLayout(main_layout)
 
     def init_llm(self):
@@ -71,16 +102,35 @@ class ChatApp(QWidget):
         )
 
     def on_send_button_clicked(self):
-        user_input = self.input_box.text()[:512]  # Begrenze die Eingabe auf 512 Zeichen
-        self.input_box.clear()
+        #user_input = self.input_box.text()[:512]  # Begrenze die Eingabe auf 512 Zeichen
+        #self.input_box.clear()
 
         # Speichere das aktuelle Dialogfragment
-        self.dialogue.append(("Du", user_input))
+        #self.dialogue.append(("Du", user_input))
 
         # Sende die Benutzereingabe an das LLM-Modell zur Verarbeitung
-        self.append_to_chat_history("Du: " + user_input)
+        #self.append_to_chat_history("Du: " + user_input)
+        #response = self.generate_response(self.dialogue)
+        #self.append_to_chat_history("Chatbot: " + response)
+        #while self.record:
+        #    try:
+        query = self.user_speech()
+        self.dialogue.append(("Du", query))
+        self.append_to_chat_history("Du: " + query)
         response = self.generate_response(self.dialogue)
         self.append_to_chat_history("Chatbot: " + response)
+        self.speak(response)
+            #interactions(input())
+        #    except Exception as e:
+        #        print(e)
+        #        continue
+        
+    def on_stop_button_clicked(self):
+        self.record = False
+        self.append_to_chat_history("Aufnahme gestoppt")
+
+    def exit(self):
+        self.close()
 
     def generate_response(self, dialogue):
         # Aneinanderhängen von vorherigen Dialogfragmente zu einem Gespräch
@@ -100,6 +150,26 @@ class ChatApp(QWidget):
 
     def append_to_chat_history(self, message):
         self.chat_history.append(message)
+    
+    # Speech to text
+    def user_speech(self):
+        recognizer = speech_recognition.Recognizer()
+        with speech_recognition.Microphone() as mic:
+
+            recognizer.adjust_for_ambient_noise(mic, duration=0.2)
+            audio = recognizer.listen(mic)
+
+            text = recognizer.recognize_google(audio, language="en-US")
+            text_lower = text.lower()
+            print(f"Recognized {text_lower}")
+        return text_lower
+    
+    # Translate text to sound with gTTS (Google Text To Speech) and play it with ffplay
+    # This is the best sounding solution for now
+    def speak(self, text):
+        sound = gTTS(text, lang='en')
+        sound.save("voice.mp3")
+        os.system("ffplay -autoexit -loglevel quiet voice.mp3")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
