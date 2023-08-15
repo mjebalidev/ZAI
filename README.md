@@ -17,3 +17,9 @@ pip install -r requirements.txt
 ```shell
 python bot.py
 ```
+
+## App buttons:
+
+- Start listening: Das Skript beginnt, Sie aufzuzeichnen, Sie müssen nach dem Drücken der Taste sprechen.
+- Stop listening: Das Skript stoppt die Aufnahme
+- Exit: Das Skript stoppt
