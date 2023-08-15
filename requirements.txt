@@ -3,3 +3,6 @@ huggingface_hub
 python-dotenv
 langchain
 PyQt5
+SpeechRecognition
+gtts
+audiofile
