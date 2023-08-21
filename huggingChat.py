@@ -13,6 +13,9 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+################## QUELLCODE ###########################################
+# Quelle 1: https://github.com/PromtEngineer/Chat-App-OpenAssistant-API für den Chatbot
+# Quelle 2: https://www.pythonguis.com/pyqt5/,  https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html und https://doc.qt.io/ für PyQt5.QtWidgets
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QHBoxLayout
