@@ -13,6 +13,18 @@
 #
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+####### QUELLCODE ########
+# Quelle 1: https://github.com/PromtEngineer/Chat-App-OpenAssistant-API für den Chatbot
+# Quelle 2: https://www.pythonguis.com/pyqt5/,  https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html und https://doc.qt.io/ für PyQt5.QtWidgets
+# Quelle 3: https://www.geeksforgeeks.org/python-speech-recognition-on-large-audio-files/ für die Spracherkennung
+# Quelle 4: https://www.geeksforgeeks.org/python-convert-text-to-speech/ für die Sprachausgabe
+# Quelle 5: https://www.youtube.com/watch?v=_1uN7o1PpZo "Wie bildet man einen AI Assisten?" video auf Französisch
+# Quelle 6: https://github.com/ggeop/Python-ai-assistant "Python AI Assistant" example
+# Quelle 7: https://github.com/leon-ai/leon "Python AI Assistant" example
+# Quelle 8: https://youtu.be/RpWeNzfSUHw "Chatbot with Pytorch" video
+# Quelle 9: https://youtu.be/1zf_-GuMboA für die Spracherkennung
+# Quelle 10: https://youtu.be/YereI6Gn3bM für die Spracherkennung mit Pytorch
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QHBoxLayout
