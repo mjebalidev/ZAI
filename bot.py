@@ -26,24 +26,35 @@
 # Quelle 9: https://youtu.be/1zf_-GuMboA für die Spracherkennung
 # Quelle 10: https://youtu.be/YereI6Gn3bM für die Spracherkennung mit Pytorch
 
+#Import os
+import os
 import sys
+#GUI imports
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QLineEdit, QPushButton, QHBoxLayout
+#Speech to text
 import speech_recognition
-from gtts import gTTS #Google Text To Speech
+#Google Text To Speech
+from gtts import gTTS
+#Model imports 
 from langchain import PromptTemplate, HuggingFaceHub, LLMChain
+#Environment variables
 from dotenv import load_dotenv
+#Audio imports
 import audiofile as af
 
 # Lade die Umgebungsvariablen.
 load_dotenv()
 
+# Main ChatApp Klasse
 class ChatApp(QWidget):
+    # Initialisierung der Klasse
     def __init__(self):
         super().__init__()
         self.init_ui()  # Initialisiere die Benutzeroberfläche (UI)
         self.init_llm()  # Initialisiere das Language Model (LLM)
         self.dialogue = []  # Liste für den gesamten Dialog
 
+    # Initialisierung der Benutzeroberfläche
     def init_ui(self):
         # Setze Fenster-Eigenschaften
         self.setWindowTitle("Chatbot")
@@ -55,6 +66,7 @@ class ChatApp(QWidget):
         self.chat_history.setStyleSheet("QTextEdit { border: 1px solid gray; border-radius: 10px; padding: 10px; }")
 
         # Setze Eigenschaften der Eingabebox
+        # Im Moment nicht benutzt, da wir die Spracheingabe verwenden
         #self.input_box = QLineEdit(self)
         #self.input_box.setPlaceholderText("Tippe deine Nachricht hier ein und drücke Enter zum Senden...")
         #self.input_box.setStyleSheet("QLineEdit { border: 1px solid gray; border-radius: 10px; padding: 5px; }")
@@ -78,6 +90,7 @@ class ChatApp(QWidget):
         #chat_input_layout = QHBoxLayout()
         #chat_input_layout.addWidget(self.input_box)
 
+        # Setze Layouts
         send_button_layout = QVBoxLayout()
         send_button_layout.addWidget(self.send_button)
 
@@ -95,6 +108,7 @@ class ChatApp(QWidget):
         main_layout.addLayout(exit_button_layout)
         self.setLayout(main_layout)
 
+    # Initialisierung des Language Models
     def init_llm(self):
         template = """<|prompter|>{question}<|endoftext|><|assistant|>
         """
@@ -109,6 +123,8 @@ class ChatApp(QWidget):
             prompt=prompt
         )
 
+    # Funktionen für die Buttons
+    # Sende die Benutzereingabe an das LLM-Modell zur Verarbeitung
     def on_send_button_clicked(self):
         # Old chat implementation
         #user_input = self.input_box.text()[:512]  # Begrenze die Eingabe auf 512 Zeichen
@@ -127,13 +143,17 @@ class ChatApp(QWidget):
         response = self.generate_response(self.dialogue)
         self.append_to_chat_history("Chatbot: " + response)
         self.speak(response)
-        
+    
+    # Stoppe die Aufnahme
+    # Im Moment nicht korrket implementiert
     def on_stop_button_clicked(self):
         self.append_to_chat_history("Aufnahme gestoppt")
 
+    # Beende das Programm
     def exit(self):
         self.close()
 
+    # Generiere die Antwort des Chatbots
     def generate_response(self, dialogue):
         # Aneinanderhängen von vorherigen Dialogfragmente zu einem Gespräch
         conversation = " ".join(f"{sender}: {message}" for sender, message in dialogue)
@@ -150,30 +170,31 @@ class ChatApp(QWidget):
 
         return response
 
+    # Fuction for appending the chat history
     def append_to_chat_history(self, message):
         self.chat_history.append(message)
     
     # Speech to text
     def user_speech(self):
+        # Spracherkennung mit Google Speech Recognition
         recognizer = speech_recognition.Recognizer()
         with speech_recognition.Microphone() as mic:
-
             recognizer.adjust_for_ambient_noise(mic, duration=0.2)
             audio = recognizer.listen(mic)
-
             text = recognizer.recognize_google(audio, language="en-US")
             text_lower = text.lower()
             print(f"Recognized {text_lower}")
         return text_lower
     
-    # Translate text to sound with gTTS (Google Text To Speech) and play it with ffplay
-    # This is the best sounding solution for now
+    # Übersetzung von Text zu Sprache durch Google Text To Speech (gtts)
+    # Dies ist eine sehr einfache Implementierung, die nicht sehr gut funktioniert und nur für die Demonstration verwendet wird
     def speak(self, text):
         sound = gTTS(text, lang='en')
         sound.save("voice.mp3")
         os.system("ffplay -autoexit -loglevel quiet voice.mp3")
         #af.read("voice.mp3")
 
+# Starte die Anwendung
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     chat_app = ChatApp()
